@@ -1,7 +1,6 @@
 package account
 
 import (
-	"fmt"
 	"link-test/business"
 )
 
@@ -16,6 +15,10 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) FindBalanceByAccNo(accNo string) (*Account, error) {
+
+	if accNo == "" {
+		return nil, business.ErrInvalidSpec
+	}
 
 	account, err := s.repository.FindBalanceByAccNo(accNo)
 
@@ -33,7 +36,7 @@ func (s *service) TransBalance(tr TransferRequest) error {
 
 	fromAcc, err := s.repository.FindBalanceByAccNo(tr.FromAccNo)
 	toAcc, err := s.repository.FindBalanceByAccNo(tr.ToAccNo)
-	fmt.Println(fromAcc.Balance)
+
 	if fromAcc.Balance < tr.Amount {
 		return business.ErrBalanceNotEnough
 	}

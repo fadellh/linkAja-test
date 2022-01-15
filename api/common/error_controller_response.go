@@ -9,35 +9,24 @@ const (
 	ErrForbidden  errorControllerResponseCode = "forbidden"
 )
 
-//ControllerResponse default payload response
 type ControllerResponse struct {
 	Code    errorControllerResponseCode `json:"code"`
 	Message string                      `json:"message"`
 	Data    interface{}                 `json:"data"`
 }
 
-//NewBadRequestResponse bad request format response
-func NewBadRequestResponse() (int, ControllerResponse) {
+func NewBadRequestResponse(msg string) (int, ControllerResponse) {
 	return http.StatusBadRequest, ControllerResponse{
 		ErrBadRequest,
-		"Bad request",
+		"Bad request " + msg,
 		map[string]interface{}{},
 	}
 }
 
-//NewForbiddenResponse default for Forbidden error response
 func NewForbiddenResponse() (int, ControllerResponse) {
 	return http.StatusForbidden, ControllerResponse{
 		ErrForbidden,
 		"Forbidden",
-		map[string]interface{}{},
-	}
-}
-
-func NewUngrantResponse() (int, ControllerResponse) {
-	return http.StatusForbidden, ControllerResponse{
-		ErrForbidden,
-		"Request Not Allowed",
 		map[string]interface{}{},
 	}
 }

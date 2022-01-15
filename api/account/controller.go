@@ -38,8 +38,17 @@ func (ctr *Controller) TransBalance(c echo.Context) error {
 
 	accNo := c.Param("from_number")
 	tr := new(request.TransferRequest)
+
 	if err := c.Bind(tr); err != nil {
-		return c.JSON(common.NewBadRequestResponse())
+		return c.JSON(common.NewErrorBusinessResponse(err))
+	}
+
+	if accNo == "" || tr.ToAccNumber == "" {
+		return c.JSON(common.NewBadRequestResponse("account number must filled"))
+	}
+
+	if tr.Amount <= 0 {
+		return c.JSON(common.NewBadRequestResponse("Amount cannot negative or null"))
 	}
 
 	at := account.TransferRequest{

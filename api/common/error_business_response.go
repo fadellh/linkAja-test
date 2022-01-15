@@ -43,7 +43,6 @@ func errorMapping(err error) (int, BusinessResponse) {
 	}
 }
 
-//newInternalServerErrorResponse default internal server error response
 func newInternalServerErrorResponse() (int, BusinessResponse) {
 	return http.StatusInternalServerError, BusinessResponse{
 		errInternalServerError,
@@ -52,7 +51,6 @@ func newInternalServerErrorResponse() (int, BusinessResponse) {
 	}
 }
 
-//newHasBeedModifiedResponse failed to validate request payload
 func newHasBeedModifiedResponse() (int, BusinessResponse) {
 	return http.StatusBadRequest, BusinessResponse{
 		errHasBeenModified,
@@ -61,7 +59,6 @@ func newHasBeedModifiedResponse() (int, BusinessResponse) {
 	}
 }
 
-//newNotFoundResponse default not found error response
 func newNotFoundResponse() (int, BusinessResponse) {
 	return http.StatusNotFound, BusinessResponse{
 		errNotFound,
@@ -70,7 +67,6 @@ func newNotFoundResponse() (int, BusinessResponse) {
 	}
 }
 
-//newValidationResponse failed to validate request payload
 func newValidationResponse(message string) (int, BusinessResponse) {
 	return http.StatusBadRequest, BusinessResponse{
 		errInvalidSpec,
