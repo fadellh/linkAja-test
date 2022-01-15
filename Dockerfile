@@ -10,6 +10,7 @@ RUN go build -o main ./app/
 # stage 2
 FROM alpine:3.14
 WORKDIR /root/
-COPY --from=builder ./main .
+COPY --from=builder ./app/main . 
 EXPOSE 2801
+RUN chmod +x main
 CMD ["./main"]

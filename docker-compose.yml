@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  linkAjaPayment:
+  payment:
     build: .
     ports:
       - 2801:2801
@@ -11,3 +11,5 @@ services:
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: link
