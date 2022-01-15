@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  linkAjaPayment:
+    build: .
+    ports:
+      - 2801:2801
+  db:
+    image: postgres:14.1-alpine
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
