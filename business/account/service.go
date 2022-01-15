@@ -30,19 +30,19 @@ func (s *service) FindBalanceByAccNo(accNo string) (*Account, error) {
 
 func (s *service) TransBalance(tr TransferRequest) error {
 
-	if tr.FromAccNo == "" || tr.Amount == 0 || tr.ToAccNo == "" {
+	if tr.FromAccNo == "" || tr.Amount <= 0 || tr.ToAccNo == "" {
 		return business.ErrInvalidSpec
 	}
 
 	fromAcc, err := s.repository.FindBalanceByAccNo(tr.FromAccNo)
 	toAcc, err := s.repository.FindBalanceByAccNo(tr.ToAccNo)
 
-	if fromAcc.Balance < tr.Amount {
-		return business.ErrBalanceNotEnough
-	}
-
 	if err != nil {
 		return err
+	}
+
+	if fromAcc.Balance < tr.Amount {
+		return business.ErrBalanceNotEnough
 	}
 
 	tr.FromAccNoBalance = fromAcc.Balance

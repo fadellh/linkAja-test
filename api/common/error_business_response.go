@@ -62,7 +62,7 @@ func newHasBeedModifiedResponse() (int, BusinessResponse) {
 func newNotFoundResponse() (int, BusinessResponse) {
 	return http.StatusNotFound, BusinessResponse{
 		errNotFound,
-		"Data Not found",
+		"Account Not found",
 		map[string]interface{}{},
 	}
 }
