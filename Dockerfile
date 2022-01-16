@@ -12,4 +12,4 @@ FROM alpine:3.14
 WORKDIR /root
 COPY --from=builder /app/main . 
 EXPOSE 2801
-CMD ["root/main"]
+CMD ["/root/main"]

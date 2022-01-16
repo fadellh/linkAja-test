@@ -30,8 +30,8 @@ func newDatabaseConnection() *gorm.DB {
 	configDB := map[string]string{
 		"DB_Username": "postgres",
 		"DB_Password": "password",
-		"DB_Port":     "5433",
-		"DB_Host":     "localhost",
+		"DB_Port":     "5432",
+		"DB_Host":     "db",
 		"DB_Name":     "link",
 	}
 
@@ -67,7 +67,8 @@ func Start() {
 
 	go func() {
 		// address := fmt.Sprintf("localhost:%d", config.AppPort)
-		address := fmt.Sprintf("localhost:2801")
+		address := fmt.Sprintf("0.0.0.0:2801")
+		// address := fmt.Sprintf("localhost:2801")
 		fmt.Println(address)
 		if err := e.Start(address); err != nil {
 			fmt.Println(err)

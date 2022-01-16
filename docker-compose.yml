@@ -3,15 +3,22 @@ services:
   payment:
     build: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - 2801:2801
   db:
+    container_name: pg_db
     image: postgres:14.1-alpine
     ports:
       - 5433:5432
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: link
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
