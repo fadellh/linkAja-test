@@ -5,8 +5,8 @@ import "net/http"
 type errorControllerResponseCode string
 
 const (
-	ErrBadRequest errorControllerResponseCode = "bad_request"
-	ErrForbidden  errorControllerResponseCode = "forbidden"
+	ErrBadRequest errorControllerResponseCode = "400"
+	ErrForbidden  errorControllerResponseCode = "403"
 )
 
 type ControllerResponse struct {

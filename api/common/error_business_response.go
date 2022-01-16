@@ -8,12 +8,11 @@ import (
 type errorBusinessResponseCode string
 
 const (
-	errInternalServerError errorBusinessResponseCode = "internal_server_error"
-	errHasBeenModified     errorBusinessResponseCode = "data_has_been modified"
-	errNotFound            errorBusinessResponseCode = "data_not_found"
-	errInvalidSpec         errorBusinessResponseCode = "invalid_spec"
-	errBalance             errorBusinessResponseCode = "balance_not_enough"
-	errUpdate              errorBusinessResponseCode = "err_update_balance"
+	errInternalServerError errorBusinessResponseCode = "500"
+	errNotFound            errorBusinessResponseCode = "404"
+	errInvalidSpec         errorBusinessResponseCode = "400"
+	errBalance             errorBusinessResponseCode = "400"
+	errUpdate              errorBusinessResponseCode = "503"
 )
 
 //BusinessResponse default payload response
@@ -37,8 +36,6 @@ func errorMapping(err error) (int, BusinessResponse) {
 		return newNotFoundResponse()
 	case business.ErrInvalidSpec:
 		return newValidationResponse(err.Error())
-	case business.ErrHasBeenModified:
-		return newHasBeedModifiedResponse()
 	case business.ErrBalanceNotEnough:
 		return newBalanceNotEnough(err.Error())
 	case business.ErrUpdateBalance:
@@ -50,14 +47,6 @@ func newInternalServerErrorResponse() (int, BusinessResponse) {
 	return http.StatusInternalServerError, BusinessResponse{
 		errInternalServerError,
 		"Internal server error",
-		map[string]interface{}{},
-	}
-}
-
-func newHasBeedModifiedResponse() (int, BusinessResponse) {
-	return http.StatusBadRequest, BusinessResponse{
-		errHasBeenModified,
-		"Data has been modified",
 		map[string]interface{}{},
 	}
 }
@@ -87,7 +76,7 @@ func newBalanceNotEnough(message string) (int, BusinessResponse) {
 }
 
 func newErrUpdateBalance(message string) (int, BusinessResponse) {
-	return http.StatusExpectationFailed, BusinessResponse{
+	return http.StatusServiceUnavailable, BusinessResponse{
 		errUpdate,
 		message,
 		map[string]interface{}{},
