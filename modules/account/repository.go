@@ -73,11 +73,6 @@ func (r Repository) TransBalance(tr account.TransferRequest) error {
 	var accTable AccountTable
 
 	tx := r.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
 
 	err := tx.Model(&accTable).Where("account_number = ?", tr.FromAccNo).Update("balance", tr.FromAccNoBalance-tr.Amount).Error
 	if err != nil {
