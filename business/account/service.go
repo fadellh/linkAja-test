@@ -51,7 +51,7 @@ func (s *service) TransBalance(tr TransferRequest) error {
 	err = s.repository.TransBalance(tr)
 
 	if err != nil {
-		return err
+		return business.ErrUpdateBalance
 	}
 
 	return nil

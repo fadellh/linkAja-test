@@ -13,6 +13,7 @@ const (
 	errNotFound            errorBusinessResponseCode = "data_not_found"
 	errInvalidSpec         errorBusinessResponseCode = "invalid_spec"
 	errBalance             errorBusinessResponseCode = "balance_not_enough"
+	errUpdate              errorBusinessResponseCode = "err_update_balance"
 )
 
 //BusinessResponse default payload response
@@ -40,6 +41,8 @@ func errorMapping(err error) (int, BusinessResponse) {
 		return newHasBeedModifiedResponse()
 	case business.ErrBalanceNotEnough:
 		return newBalanceNotEnough(err.Error())
+	case business.ErrUpdateBalance:
+		return newErrUpdateBalance(err.Error())
 	}
 }
 
@@ -78,6 +81,14 @@ func newValidationResponse(message string) (int, BusinessResponse) {
 func newBalanceNotEnough(message string) (int, BusinessResponse) {
 	return http.StatusBadRequest, BusinessResponse{
 		errBalance,
+		message,
+		map[string]interface{}{},
+	}
+}
+
+func newErrUpdateBalance(message string) (int, BusinessResponse) {
+	return http.StatusExpectationFailed, BusinessResponse{
+		errUpdate,
 		message,
 		map[string]interface{}{},
 	}

@@ -12,4 +12,6 @@ var (
 	ErrInvalidSpec = errors.New("Given spec is not valid")
 
 	ErrBalanceNotEnough = errors.New("Balance is not enough")
+
+	ErrUpdateBalance = errors.New("Error update balance")
 )

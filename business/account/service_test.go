@@ -13,9 +13,12 @@ import (
 
 var (
 	accountService    account.Service
+	transService      account.Service
 	accountRepository accountMock.Repository
+	transRepository   accountMock.Repository
 
 	accountData account.Account
+	accData     []account.Account
 
 	// mockDB = map[string]*User{
 	// 	"jon@labstack.com": &User{"Jon Snow", "jon@labstack.com"},
@@ -26,6 +29,20 @@ var (
 func TestMain(m *testing.M) {
 	setup()
 	os.Exit(m.Run())
+}
+
+func setup() {
+
+	accountData.AccNumber = "550001"
+	accountData.Name = "Bob Martin"
+	accountData.Balance = 10000
+
+	accData = append(accData, account.Account{AccNumber: "550002", Name: "Linux Martin", Balance: 15000})
+	accData = append(accData, account.Account{AccNumber: "550001", Name: "Bob Martin", Balance: 10000})
+	// fmt.Println(accData)
+
+	accountService = account.NewService(&accountRepository)
+	transService = account.NewService(&transRepository)
 }
 
 func TestFindBalanceByAccNo(t *testing.T) {
@@ -41,7 +58,7 @@ func TestFindBalanceByAccNo(t *testing.T) {
 	})
 
 	t.Run("Expect Account Not Found", func(t *testing.T) {
-		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound)
+		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound).Once()
 
 		account, err := accountService.FindBalanceByAccNo(accountData.AccNumber)
 
@@ -51,8 +68,7 @@ func TestFindBalanceByAccNo(t *testing.T) {
 	})
 
 	t.Run("Expect Error invalid spec", func(t *testing.T) {
-		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(nil, business.ErrInvalidSpec)
-
+		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(nil, business.ErrInvalidSpec).Once()
 		account, err := accountService.FindBalanceByAccNo("")
 
 		assert.Nil(t, account)
@@ -63,11 +79,13 @@ func TestFindBalanceByAccNo(t *testing.T) {
 }
 
 func TestTransBalance(t *testing.T) {
-	t.Run("Expect Create Data", func(t *testing.T) {
-		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accountData, nil)
-		accountRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(nil).Once()
 
-		err := accountService.TransBalance(account.TransferRequest{
+	t.Run("Expect Create Data", func(t *testing.T) {
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accData[0], nil).Once()
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accData[1], nil).Once()
+		transRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(nil).Once()
+
+		err := transService.TransBalance(account.TransferRequest{
 			FromAccNo: "555001",
 			ToAccNo:   "555002",
 			Amount:    100,
@@ -77,10 +95,11 @@ func TestTransBalance(t *testing.T) {
 	})
 
 	t.Run("Expect Error not found", func(t *testing.T) {
-		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound)
-		accountRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(business.ErrNotFound)
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound).Once()
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound).Once()
+		transRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(business.ErrNotFound).Once()
 
-		err := accountService.TransBalance(account.TransferRequest{
+		err := transService.TransBalance(account.TransferRequest{
 			FromAccNo: "555001",
 			ToAccNo:   "555003",
 			Amount:    100,
@@ -91,10 +110,11 @@ func TestTransBalance(t *testing.T) {
 	})
 
 	t.Run("Expect Balance not enough", func(t *testing.T) {
-		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accountData, nil)
-		accountRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(nil)
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accData[0], nil).Once()
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accData[1], nil).Once()
+		transRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(nil).Once()
 
-		err := accountService.TransBalance(account.TransferRequest{
+		err := transService.TransBalance(account.TransferRequest{
 			FromAccNo: "555001",
 			ToAccNo:   "555002",
 			Amount:    100000,
@@ -105,10 +125,11 @@ func TestTransBalance(t *testing.T) {
 	})
 
 	t.Run("Expect Error invalid spec", func(t *testing.T) {
-		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accountData, nil)
-		accountRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(nil)
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accData[0], nil).Once()
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accData[1], nil).Once()
+		transRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(nil).Once()
 
-		err := accountService.TransBalance(account.TransferRequest{
+		err := transService.TransBalance(account.TransferRequest{
 			FromAccNo: "",
 			ToAccNo:   "",
 			Amount:    0,
@@ -119,24 +140,17 @@ func TestTransBalance(t *testing.T) {
 	})
 
 	t.Run("Expect Error Transer", func(t *testing.T) {
-		accountRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accountData, nil)
-		accountRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(new(error))
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accData[0], nil).Once()
+		transRepository.On("FindBalanceByAccNo", mock.AnythingOfType("string")).Return(&accData[1], nil).Once()
+		transRepository.On("TransBalance", mock.AnythingOfType("account.TransferRequest")).Return(business.ErrUpdateBalance)
 
-		err := accountService.TransBalance(account.TransferRequest{
+		err := transService.TransBalance(account.TransferRequest{
 			FromAccNo: "555001",
 			ToAccNo:   "555002",
 			Amount:    1000,
 		})
 
 		assert.NotNil(t, err)
+		assert.Equal(t, err, business.ErrUpdateBalance)
 	})
-}
-
-func setup() {
-
-	accountData.AccNumber = "550001"
-	accountData.Name = "Bob Martin"
-	accountData.Balance = 10000
-
-	accountService = account.NewService(&accountRepository)
 }
