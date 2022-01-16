@@ -1,15 +1,15 @@
 FROM golang:1.16-alpine AS builder
 
-RUN mkdir /app
-ADD . /app
 WORKDIR /app
-RUN go clean --modcache
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+COPY . .
 RUN go build -o main .
 
 # stage 2
 FROM alpine:3.14
-WORKDIR /root/
+WORKDIR /root
 COPY --from=builder /app/main . 
 EXPOSE 2801
-# RUN chmod +x main
-CMD ["./main"]
+CMD ["root/main"]

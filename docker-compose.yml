@@ -2,6 +2,8 @@ version: "3.8"
 services:
   payment:
     build: .
+    depends_on:
+      - db
     ports:
       - 2801:2801
   db:
